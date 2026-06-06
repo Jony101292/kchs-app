@@ -12,15 +12,15 @@ const YEARS = Array.from({length:10},(_,i)=>2024+i);
 
 const DEFAULT_PARTICULARS = {
   muniAssessment:   {label:"Muni. Assessment",          default:""},
-  maintenanceCharges:{label:"Maintenance Charges",      default:"1800"},
+  maintenanceCharges:{label:"Maintenance Charges",      default:""},
   sinkingFund:      {label:"Sinking Fund",              default:""},
   welfareFund:      {label:"Welfare Fund",              default:""},
   parkingCharges:   {label:"Parking Charges",           default:""},
   lateCharges:      {label:"Late Charges (Vilamb Akar)",default:""},
-  repairFund:       {label:"Imarat Durusti Nidhi",      default:"200"},
-  transferFee:      {label:"Sadanika Transfer Fee",     default:""},
-  transferPremium:  {label:"Sadanika Transfer Premium", default:""},
-  caretaker:        {label:"Care Taker",                default:"200"},
+  repairFund:       {label:"Bldg Reapir Nidhi",      default:""},
+  transferFee:      {label:"Room Transfer Fee",     default:""},
+  transferPremium:  {label:"Room Transfer Premium", default:""},
+  caretaker:        {label:"Care Taker",                default:""},
   extra1:           {label:"",                          default:""},
   extra2:           {label:"",                          default:""},
 };
