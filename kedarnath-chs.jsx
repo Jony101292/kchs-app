@@ -83,8 +83,8 @@ export default function App() {
 
   // PDF generation using jsPDF + html2canvas
   async function handleSavePDF(rec){
-    const { default: html2canvas } = await import("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.esm.min.js");
-    const jsPDFModule = await import("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+    const { default: html2canvas } = await import("html2canvas");
+const jsPDFModule = await import("jspdf");
     const jsPDF = jsPDFModule.default?.jsPDF || jsPDFModule.jsPDF || window.jspdf?.jsPDF;
 
     const el = document.getElementById("receipt-print-area");
