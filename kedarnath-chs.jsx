@@ -51,7 +51,7 @@ export default function App() {
   const [showReceipt, setShowReceipt] = useState(null);
   const [filterYear,  setFilterYear]  = useState(String(new Date().getFullYear()));
   const [filterMonth, setFilterMonth] = useState("All");
-  const receiptRef = useRef();
+  //const receiptRef = useRef();
 
   const [form, setForm] = useState({
     flatNo:"101", memberName:"", forMonth:MONTHS[new Date().getMonth()],
@@ -116,7 +116,7 @@ const jsPDFModule = await import("jspdf");
   },{});
 
   const availYears  = Object.keys(grouped).sort((a,b)=>b-a);
-  const availMonths = filterYear&&grouped[filterYear] ? Object.keys(grouped[filterYear]) : [];
+  //const availMonths = filterYear&&grouped[filterYear] ? Object.keys(grouped[filterYear]) : [];
   const displayRecs = filterYear && grouped[filterYear]
     ? filterMonth==="All"
       ? Object.values(grouped[filterYear]).flat()
