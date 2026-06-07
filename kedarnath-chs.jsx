@@ -1,55 +1,27 @@
 import React, { useState } from "react";
-
 const ROOMS = [
   "001","002","003","004","005","006","007",
   "101","102","103","104","105","106",
   "201","202","203","204","205","206",
   "301","302","303","304"
 ];
-
-const FLAT_OWNERS = {
-  "001": "Smt. S. Hegde",
-  "002": "Shri. Talpade",
-  "003": "Shri. Ansari",
-  "004": "Smt. Bhalerao",
-  "005": "Shri. Dubey",
-  "006": "Smt. R Pawar",
-  "007": "S. Khan",
-  "101": "Smt. C Mancharkar",
-  "102": "Shri. L Mancharkar",
-  "103": "Shri. A Bhangre",
-  "104": "Smt. R Khardikar",
-  "105": "Shri. S Gangurde",
-  "106": "Smt. S Jadhav",
-  "201": "Shri. M Khardikar",
-  "202": "Shri. V Nikalje",
-  "203": "Shri. A Thorat",
-  "204": "Shri. P Awate",
-  "205": "Shri. D Khatate",
-  "206": "Smt. P Gambhire",
-  "301": "Shri. B Adhangale",
-  "302": "Shri. B Gangawane",
-  "303": "Shri. M Satpute",
-  "304": "Shri. K Harad",
-};
-
 const MONTHS = ["January","February","March","April","May","June",
   "July","August","September","October","November","December"];
 const YEARS = Array.from({length:10},(_,i)=>2024+i);
 
 const DEFAULT_PARTICULARS = {
-  muniAssessment:    {label:"Muni. Assessment",       default:""},
-  maintenanceCharges:{label:"Maintenance Charges",    default:"900"},
-  sinkingFund:       {label:"Sinking Fund",           default:""},
-  welfareFund:       {label:"Welfare Fund",           default:""},
-  parkingCharges:    {label:"Parking Charges",        default:""},
-  lateCharges:       {label:"Late Charges",           default:""},
-  repairFund:        {label:"Bldg Repair Fund",       default:"100"},
-  transferFee:       {label:"Room Transfer Fee",      default:""},
-  transferPremium:   {label:"Room Transfer Premium",  default:""},
-  caretaker:         {label:"Care Taker",             default:""},
-  extra1:            {label:"",                       default:""},
-  extra2:            {label:"",                       default:""},
+  muniAssessment:   {label:"Muni. Assessment",          default:""},
+  maintenanceCharges:{label:"Maintenance Charges",      default:"900"},
+  sinkingFund:      {label:"Sinking Fund",              default:""},
+  welfareFund:      {label:"Welfare Fund",              default:""},
+  parkingCharges:   {label:"Parking Charges",           default:""},
+  lateCharges:      {label:"Late Charges ",             default:""},
+  repairFund:       {label:"Bldg Reapir fund",         default:"100"},
+  transferFee:      {label:"Room Transfer Fee",         default:""},
+  transferPremium:  {label:"Room Transfer Premium",     default:""},
+  caretaker:        {label:"Care Taker",                default:""},
+  extra1:           {label:"",                          default:""},
+  extra2:           {label:"",                          default:""},
 };
 
 const blankParticulars = () =>
@@ -61,27 +33,12 @@ const getTotal = p =>
 const todayStr = () => new Date().toISOString().split("T")[0];
 
 const STORAGE_KEY = "kchs_records_v2";
+
 function loadRecords() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]"); } catch{ return []; }
 }
 function saveRecords(r) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(r)); } catch{}
-}
-
-/* ── Confirm modal ── */
-function ConfirmModal({message, onConfirm, onCancel}) {
-  return (
-    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.5)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"16px"}}>
-      <div style={{background:"#fff",borderRadius:"10px",padding:"28px 28px 20px",maxWidth:"340px",width:"100%",boxShadow:"0 8px 32px rgba(0,0,0,.25)",fontFamily:"'Source Serif 4',serif"}}>
-        <div style={{fontSize:"22px",marginBottom:"10px",textAlign:"center"}}>⚠️</div>
-        <div style={{fontSize:"13.5px",color:"#333",marginBottom:"22px",textAlign:"center",lineHeight:1.6}}>{message}</div>
-        <div style={{display:"flex",gap:"10px",justifyContent:"center"}}>
-          <button onClick={onCancel}  style={{padding:"9px 22px",border:"2px solid #1b3d2a",borderRadius:"7px",background:"#fff",color:"#1b3d2a",fontFamily:"'Playfair Display',serif",fontSize:"13px",cursor:"pointer"}}>Cancel</button>
-          <button onClick={onConfirm} style={{padding:"9px 22px",border:"none",borderRadius:"7px",background:"#c0392b",color:"#fff",fontFamily:"'Playfair Display',serif",fontSize:"13px",cursor:"pointer"}}>Delete</button>
-        </div>
-      </div>
-    </div>
-  );
 }
 
 export default function App() {
@@ -94,104 +51,47 @@ export default function App() {
   const [showReceipt, setShowReceipt] = useState(null);
   const [filterYear,  setFilterYear]  = useState(String(new Date().getFullYear()));
   const [filterMonth, setFilterMonth] = useState("All");
-
-  // Edit mode: holds the receiptNo being edited (null = new receipt)
-  const [editingReceiptNo, setEditingReceiptNo] = useState(null);
-
-  // Delete confirm
-  const [confirmDelete, setConfirmDelete] = useState(null);
+  //const receiptRef = useRef();
 
   const [form, setForm] = useState({
-    flatNo:"101", memberName:FLAT_OWNERS["101"], forMonth:MONTHS[new Date().getMonth()],
+    flatNo:"101", memberName:"", forMonth:MONTHS[new Date().getMonth()],
     forYear:new Date().getFullYear(), paymentDate:todayStr(),
     paymentMode:"online", chequeNo:"", bank:"", folioNo:"",
     particulars: blankParticulars(),
   });
 
-  function setF(k,v){
-    if(k === "flatNo") {
-      const owner = FLAT_OWNERS[v] || "";
-      setForm(f=>({...f, flatNo:v, memberName:owner}));
-    } else {
-      setForm(f=>({...f,[k]:v}));
-    }
-  }
+  function setF(k,v){ setForm(f=>({...f,[k]:v})); }
   function setP(k,v){ setForm(f=>({...f,particulars:{...f.particulars,[k]:v}})); }
 
-  // ── Save (new or update) ──
   function handleSave(){
     if(!form.memberName.trim()){alert("Please enter member name.");return;}
-    let updated;
-    if(editingReceiptNo !== null) {
-      const rec = {...form, receiptNo:editingReceiptNo, savedAt:new Date().toISOString(), editedAt:new Date().toISOString()};
-      updated = records.map(r => r.receiptNo === editingReceiptNo ? rec : r);
-      setRecords(updated);
-      saveRecords(updated);
-      setShowReceipt(rec);
-      setEditingReceiptNo(null);
-    } else {
-      const rec = {...form, receiptNo, savedAt:new Date().toISOString()};
-      updated = [rec,...records];
-      setRecords(updated);
-      saveRecords(updated);
-      setShowReceipt(rec);
-      setReceiptNo(n=>n+1);
-    }
-  }
-
-  // ── Edit: load record into form ──
-  function handleEdit(rec) {
-    setShowReceipt(null);
-    setForm({
-      flatNo: rec.flatNo,
-      memberName: rec.memberName,
-      forMonth: rec.forMonth,
-      forYear: rec.forYear,
-      paymentDate: rec.paymentDate,
-      paymentMode: rec.paymentMode,
-      chequeNo: rec.chequeNo||"",
-      bank: rec.bank||"",
-      folioNo: rec.folioNo||"",
-      particulars: {...blankParticulars(), ...rec.particulars},
-    });
-    setEditingReceiptNo(rec.receiptNo);
-    setTab("new");
-    window.scrollTo({top:0,behavior:"smooth"});
-  }
-
-  // ── Delete ──
-  function handleDeleteConfirmed() {
-    const rec = confirmDelete;
-    const updated = records.filter(r => r.receiptNo !== rec.receiptNo);
+    const rec = {...form, receiptNo, savedAt:new Date().toISOString()};
+    const updated = [rec,...records];
     setRecords(updated);
     saveRecords(updated);
-    setConfirmDelete(null);
-    if(showReceipt?.receiptNo === rec.receiptNo) setShowReceipt(null);
+    setShowReceipt(rec);
+    setReceiptNo(n=>n+1);
   }
 
   function handleNewReceipt(){
     setShowReceipt(null);
-    setEditingReceiptNo(null);
-    setForm(f=>({...f, memberName:FLAT_OWNERS[f.flatNo]||"", folioNo:"", paymentDate:todayStr(),
-      chequeNo:"", bank:"", particulars:blankParticulars()}));
+    setForm(f=>({...f,memberName:"",folioNo:"",paymentDate:todayStr(),
+      chequeNo:"",bank:"",particulars:blankParticulars()}));
     setTab("new");
   }
 
-  function handleCancelEdit(){
-    setEditingReceiptNo(null);
-    setForm(f=>({...f, memberName:FLAT_OWNERS[f.flatNo]||"", folioNo:"", paymentDate:todayStr(),
-      chequeNo:"", bank:"", particulars:blankParticulars()}));
-  }
-
-  // ── PDF ──
+  // PDF generation using jsPDF + html2canvas
   async function handleSavePDF(rec){
     const { default: html2canvas } = await import("html2canvas");
-    const jsPDFModule = await import("jspdf");
+const jsPDFModule = await import("jspdf");
     const jsPDF = jsPDFModule.default?.jsPDF || jsPDFModule.jsPDF || window.jspdf?.jsPDF;
+
     const el = document.getElementById("receipt-print-area");
     if(!el) return;
+
     const canvas = await html2canvas(el, {scale:2, useCORS:true, backgroundColor:"#ffffff"});
     const imgData = canvas.toDataURL("image/png");
+
     const pdf = new jsPDF({orientation:"portrait",unit:"mm",format:"a5"});
     const pw = pdf.internal.pageSize.getWidth();
     const ph = pdf.internal.pageSize.getHeight();
@@ -200,19 +100,23 @@ export default function App() {
     const ih = canvas.height*ratio/2;
     const mx = (pw-iw)/2;
     pdf.addImage(imgData,"PNG",mx,8,iw,ih);
-    pdf.save(`KCHS_Receipt_${rec.receiptNo}_Flat${rec.flatNo}_${rec.forMonth}${rec.forYear}.pdf`);
+
+    const fname = `KCHS_Receipt_${rec.receiptNo}_Flat${rec.flatNo}_${rec.forMonth}${rec.forYear}.pdf`;
+    pdf.save(fname);
   }
 
-  // ── Group records ──
+  // Group records by year → month
   const grouped = records.reduce((acc,r)=>{
-    const y = String(r.forYear), m = r.forMonth;
+    const y = String(r.forYear);
+    const m = r.forMonth;
     if(!acc[y]) acc[y]={};
     if(!acc[y][m]) acc[y][m]=[];
     acc[y][m].push(r);
     return acc;
   },{});
 
-  const availYears = Object.keys(grouped).sort((a,b)=>b-a);
+  const availYears  = Object.keys(grouped).sort((a,b)=>b-a);
+  //const availMonths = filterYear&&grouped[filterYear] ? Object.keys(grouped[filterYear]) : [];
   const displayRecs = filterYear && grouped[filterYear]
     ? filterMonth==="All"
       ? Object.values(grouped[filterYear]).flat()
@@ -220,7 +124,6 @@ export default function App() {
     : [];
 
   const total = getTotal(form.particulars);
-  const isEditing = editingReceiptNo !== null;
 
   return (
     <div style={{minHeight:"100vh",background:"#f4efe6",fontFamily:"'Georgia',serif"}}>
@@ -255,11 +158,6 @@ export default function App() {
         .btn2:hover{background:#f0ebe0;}
         .btn-pdf{background:linear-gradient(135deg,#c8973a,#a67730);color:#fff;border:none;border-radius:8px;padding:10px 20px;font-family:'Playfair Display',serif;font-size:13px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.15);transition:opacity .2s;}
         .btn-pdf:hover{opacity:.87;}
-        .btn-edit{background:#fff;color:#1b5e9a;border:1.5px solid #1b5e9a;border-radius:5px;padding:4px 11px;font-size:11px;cursor:pointer;font-family:'Source Serif 4',serif;transition:background .15s;}
-        .btn-edit:hover{background:#e8f0fb;}
-        .btn-del{background:#fff;color:#c0392b;border:1.5px solid #c0392b;border-radius:5px;padding:4px 11px;font-size:11px;cursor:pointer;font-family:'Source Serif 4',serif;transition:background .15s;}
-        .btn-del:hover{background:#fdf0ee;}
-        .edit-banner{background:#fff8e1;border:1.5px solid #f0c040;border-radius:8px;padding:10px 16px;margin:0 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font-family:'Source Serif 4',serif;}
         .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;}
         .b-cash{background:#fef3c7;color:#92400e;}
         .b-online{background:#d1fae5;color:#065f46;}
@@ -289,7 +187,6 @@ export default function App() {
         }
       `}</style>
 
-      {/* HEADER */}
       <div className="hdr">
         <div className="hdr-logo">K</div>
         <div>
@@ -299,25 +196,11 @@ export default function App() {
       </div>
 
       <div className="tabs">
-        <button className={`tab${tab==="new"?" on":""}`} onClick={()=>setTab("new")}>
-          {isEditing ? "✏️ Edit Receipt" : "🧾 New Receipt"}
-        </button>
+        <button className={`tab${tab==="new"?" on":""}`} onClick={()=>setTab("new")}>🧾 New Receipt</button>
         <button className={`tab${tab==="rec"?" on":""}`} onClick={()=>setTab("rec")}>📁 Records & Audit ({records.length})</button>
       </div>
 
-      {/* EDIT MODE BANNER */}
-      {isEditing && tab==="new" && (
-        <div className="edit-banner">
-          <span style={{fontSize:"13px",color:"#7d5a00",fontWeight:600}}>
-            ✏️ Editing Receipt <strong>#{editingReceiptNo}</strong> — make your corrections below and save.
-          </span>
-          <button onClick={handleCancelEdit} style={{background:"#fff",border:"1.5px solid #aaa",borderRadius:"6px",padding:"5px 14px",fontSize:"11px",cursor:"pointer",color:"#555",fontFamily:"'Source Serif 4',serif"}}>
-            ✕ Cancel Edit
-          </button>
-        </div>
-      )}
-
-      {/* ── NEW / EDIT RECEIPT TAB ── */}
+      {/* ── NEW RECEIPT TAB ── */}
       {tab==="new" && (<>
         <div className="card">
           <div className="sec">Member & Payment Details</div>
@@ -325,7 +208,7 @@ export default function App() {
             <div className="fg">
               <label>Flat / Room No.</label>
               <select value={form.flatNo} onChange={e=>setF("flatNo",e.target.value)}>
-                {ROOMS.map(r=><option key={r} value={r}>Flat {r}</option>)}
+                {ROOMS.map(r=><option key={r}>Flat {r}</option>)}
               </select>
             </div>
             <div className="fg">
@@ -384,10 +267,7 @@ export default function App() {
           </table>
           <div style={{display:"flex",gap:"12px",marginTop:"18px",justifyContent:"flex-end",flexWrap:"wrap"}}>
             <button className="btn2" onClick={()=>setForm(f=>({...f,particulars:blankParticulars()}))}>Reset</button>
-            {isEditing
-              ? <button className="btn1" style={{background:"linear-gradient(135deg,#1b5e9a,#0d3a6e)"}} onClick={handleSave}>💾 Save Changes →</button>
-              : <button className="btn1" onClick={handleSave}>Generate Receipt →</button>
-            }
+            <button className="btn1" onClick={handleSave}>Generate Receipt →</button>
           </div>
         </div>
       </>)}
@@ -396,6 +276,8 @@ export default function App() {
       {tab==="rec" && (
         <div className="card">
           <div className="sec">Records — Year / Month Folders</div>
+
+          {/* Year selector */}
           <div className="folder-bar">
             <span style={{fontSize:"11px",color:"#888",fontWeight:600}}>YEAR:</span>
             {availYears.map(y=>(
@@ -407,6 +289,7 @@ export default function App() {
           </div>
 
           {filterYear && grouped[filterYear] && (<>
+            {/* Month chips */}
             <div className="folder-bar" style={{marginBottom:"14px"}}>
               <span style={{fontSize:"11px",color:"#888",fontWeight:600}}>MONTH:</span>
               <span className={`month-chip${filterMonth==="All"?" sel":""}`} onClick={()=>setFilterMonth("All")}>All</span>
@@ -443,18 +326,13 @@ export default function App() {
               : displayRecs.map((r,i)=>(
                 <div key={i} className="rec-row">
                   <div>
-                    <div style={{fontWeight:700,color:"#1b3d2a",fontSize:"13px"}}>
-                      #{r.receiptNo} · Flat {r.flatNo}
-                      {r.editedAt && <span style={{marginLeft:"6px",fontSize:"9px",color:"#c8973a",fontStyle:"italic"}}>edited</span>}
-                    </div>
+                    <div style={{fontWeight:700,color:"#1b3d2a",fontSize:"13px"}}>#{r.receiptNo} · Flat {r.flatNo}</div>
                     <div style={{fontSize:"11px",color:"#888"}}>{r.memberName} · {r.forMonth} {r.forYear}</div>
                   </div>
-                  <div style={{display:"flex",alignItems:"center",gap:"8px",flexWrap:"wrap"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:"10px",flexWrap:"wrap"}}>
                     <span className={`badge b-${r.paymentMode}`}>{r.paymentMode.toUpperCase()}</span>
                     <span style={{fontWeight:700,color:"#1b3d2a",fontSize:"13px"}}>₹{getTotal(r.particulars).toLocaleString("en-IN")}/-</span>
                     <button onClick={()=>setShowReceipt(r)} style={{background:"#1b3d2a",color:"#fff",border:"none",borderRadius:"5px",padding:"4px 11px",fontSize:"11px",cursor:"pointer"}}>View</button>
-                    <button className="btn-edit" onClick={()=>handleEdit(r)}>✏️ Edit</button>
-                    <button className="btn-del"  onClick={()=>setConfirmDelete(r)}>🗑 Delete</button>
                   </div>
                 </div>
               ))
@@ -468,7 +346,9 @@ export default function App() {
         <div className="overlay" onClick={e=>{if(e.target===e.currentTarget)setShowReceipt(null);}}>
           <div className="rpaper">
             <div id="receipt-print-area" className="rinner">
+              {/* Top note */}
               <div style={{textAlign:"right",fontSize:"8.5px",color:"#888",marginBottom:"5px"}}>Sthapana - March 2005</div>
+              {/* Society header */}
               <div style={{display:"flex",alignItems:"flex-start",gap:"11px",marginBottom:"10px"}}>
                 <div style={{width:"42px",height:"42px",borderRadius:"50%",border:"2px solid #1b3d2a",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Playfair Display',serif",fontWeight:900,fontSize:"16px",color:"#1b3d2a",flexShrink:0}}>K</div>
                 <div>
@@ -480,6 +360,8 @@ export default function App() {
                 </div>
               </div>
               <hr style={{border:"none",borderTop:"1.5px solid #1b3d2a",margin:"6px 0"}}/>
+
+              {/* Receipt meta */}
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"4px",fontSize:"9.5px",marginBottom:"7px"}}>
                 {[["Receipt No.", showReceipt.receiptNo],["Folio No.", showReceipt.folioNo||"—"],
                   ["Date", new Date(showReceipt.paymentDate+"T00:00:00").toLocaleDateString("en-IN",{day:"2-digit",month:"2-digit",year:"numeric"})]
@@ -488,16 +370,21 @@ export default function App() {
                 ))}
               </div>
               <hr style={{border:"none",borderTop:"0.5px solid #ccc",margin:"5px 0"}}/>
+
+              {/* Member */}
               <div style={{marginBottom:"6px",fontSize:"10px"}}>
                 <span style={{fontSize:"8px",color:"#888",textTransform:"uppercase"}}>Flat No. / Member (Shri/Shrimati)</span>
                 <div style={{fontWeight:700,fontSize:"12.5px",color:"#1b3d2a"}}>Flat {showReceipt.flatNo} — {showReceipt.memberName}</div>
               </div>
+
               <div style={{fontSize:"9.5px",color:"#555",marginBottom:"7px"}}>
                 <strong style={{color:"#1b3d2a"}}>For Month:</strong> {showReceipt.forMonth} {showReceipt.forYear} &nbsp;|&nbsp;
                 <strong style={{color:"#1b3d2a"}}>Mode:</strong> {showReceipt.paymentMode.toUpperCase()}
                 {showReceipt.chequeNo&&<> | Chq: {showReceipt.chequeNo}</>}
                 {showReceipt.bank&&<> | Bank: {showReceipt.bank}</>}
               </div>
+
+              {/* Particulars table */}
               <table style={{width:"100%",borderCollapse:"collapse",fontSize:"10.5px",margin:"6px 0"}}>
                 <thead>
                   <tr style={{background:"#1b3d2a",color:"#fff"}}>
@@ -524,6 +411,7 @@ export default function App() {
                   </tr>
                 </tbody>
               </table>
+
               <hr style={{border:"none",borderTop:"0.5px solid #ccc",margin:"10px 0 6px"}}/>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-end",fontSize:"9px"}}>
                 <div style={{color:"#555",lineHeight:1.7}}>
@@ -535,25 +423,15 @@ export default function App() {
                 </div>
               </div>
             </div>
+
             <div className="ract">
               <button className="btn-pdf" onClick={()=>handleSavePDF(showReceipt)}>💾 Save as PDF</button>
               <button className="btn1" style={{fontSize:"13px",padding:"10px 18px"}} onClick={()=>window.print()}>🖨 Print</button>
-              <button className="btn-edit" style={{padding:"9px 14px",fontSize:"12px"}} onClick={()=>handleEdit(showReceipt)}>✏️ Edit</button>
-              <button className="btn-del"  style={{padding:"9px 14px",fontSize:"12px"}} onClick={()=>{setShowReceipt(null);setConfirmDelete(showReceipt);}}>🗑 Delete</button>
               <button className="btn2" style={{fontSize:"12px",padding:"8px 14px"}} onClick={()=>{setShowReceipt(null);setTab("rec");}}>📁 Records</button>
               <button className="btn2" style={{fontSize:"12px",padding:"8px 14px"}} onClick={handleNewReceipt}>+ New</button>
             </div>
           </div>
         </div>
-      )}
-
-      {/* ── DELETE CONFIRM MODAL ── */}
-      {confirmDelete && (
-        <ConfirmModal
-          message={<>Are you sure you want to permanently delete <strong>Receipt #{confirmDelete.receiptNo}</strong> for <strong>Flat {confirmDelete.flatNo} — {confirmDelete.memberName}</strong>?<br/><br/>This cannot be undone.</>}
-          onConfirm={handleDeleteConfirmed}
-          onCancel={()=>setConfirmDelete(null)}
-        />
       )}
     </div>
   );
